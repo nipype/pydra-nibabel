@@ -130,3 +130,6 @@ dmypy.json
 
 # Pycharm
 .idea
+
+# ignore test data
+pydra/tasks/nibabel/tests/data/
