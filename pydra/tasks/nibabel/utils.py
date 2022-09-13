@@ -4,6 +4,8 @@ import numpy as np
 from pydra import mark
 from pydra.engine.specs import File
 
+import os.path as op
+
 
 @mark.task
 @mark.annotate({"return": {"out_file": File}})
