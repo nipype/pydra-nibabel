@@ -1,6 +1,7 @@
 import os
 import nibabel as nb
 import numpy as np
+import pytest
 
 from pydra.tasks.nibabel.utils import apply_mask
 
@@ -103,16 +104,12 @@ def test_apply_mask_with_half_zeros_half_ones():
 
 
 def test_apply_mask_raises_exception_with_wrong_shape():
-    import pytest
-
     with pytest.raises(ValueError, match="Image and mask sizes do not match."):
         task = apply_mask(in_file=nifti_test_file, in_mask=wrong_shape_mask_file)
         task()
 
 
 def test_apply_mask_raises_exception_with_wrong_affine():
-    import pytest
-
     with pytest.raises(
         ValueError, match="Image and mask affines are not similar enough."
     ):
