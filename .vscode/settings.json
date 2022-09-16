@@ -3,5 +3,8 @@
         "pydra"
     ],
     "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true
+    "python.testing.pytestEnabled": true,
+    "editor.formatOnPaste": true,
+    "editor.formatOnType": true,
+    "python.formatting.provider": "black"
 }
