@@ -3,7 +3,7 @@ import nibabel as nb
 import numpy as np
 import pytest
 
-from pydra.tasks.nibabel.utils import apply_mask
+from pydra.tasks.nibabel.utils import apply_mask, regrid_to_zooms
 
 cwd = os.path.dirname(os.path.realpath(__file__))
 nifti_test_file = cwd + "/data/t1w.nii"
@@ -115,3 +115,10 @@ def test_apply_mask_raises_exception_with_wrong_affine():
     ):
         task = apply_mask(in_file=nifti_test_file, in_mask=wrong_affine_mask_file)
         task()
+
+
+def test_RegridToZooms():
+    task = regrid_to_zooms(in_file=nifti_test_file, zooms=(0.5, 0.5, 0.5))
+    result = task()
+
+    assert np.array_equal(sorted_array, nb.load(result.output.out_file).get_data())
