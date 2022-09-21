@@ -1,3 +1,4 @@
+import os
 import nibabel as nb
 import tempfile
 from pathlib import Path
@@ -115,6 +116,10 @@ def wrong_affine_mask(nifti_header, tmp_dir):
     return {"file": fpath, "array": wrong_affine_mask}
 
 
+def cleanup_files(file_del):
+    os.remove(file_del)
+
+
 def test_apply_mask_with_ones(sorted_image, ones_mask):
     task = apply_mask(in_file=sorted_image["file"], in_mask=ones_mask["file"])
     result = task()
@@ -158,15 +163,18 @@ def test_apply_mask_raises_exception_with_wrong_affine(sorted_image, wrong_affin
         task()
 
 
-# FIXME
-# def test_regrid_to_zooms(test_nifti, nifti_header):
-# task = regrid_to_zooms(in_file=nifti_header.nifti_test_file, zooms=(1, 1, 1))
-# result = task()
+def test_regrid_to_zooms_1(sorted_image):
+    zooms = (1, 1, 1)
+    pydra_task = regrid_to_zooms(in_file=sorted_image["file"], zooms=zooms)
+    pydra_result = pydra_task()
 
-# task2 = RegridToZooms()
-# task2.inputs.in_file = nifti_header.nifti_test_file
-# task2.inputs.zooms = (1, 1, 1)
-# result2 = task2.run()
+    nipype_task = RegridToZooms()
+    nipype_task.inputs.in_file = sorted_image["file"]
+    nipype_task.inputs.zooms = zooms
+    nipype_result = nipype_task.run()
 
-# res = nb.load(result.output.out_file).get_data()
-# assert np.array_equal(nifti_header.sorted_array, res)
+    pydra_result_data = nb.load(pydra_result.output.out_file).get_data()
+    nipype_result_data = nb.load(nipype_result.outputs.out_file).get_data()
+    assert np.array_equal(nipype_result_data, pydra_result_data)
+
+    cleanup_files(nipype_result.outputs.out_file)
