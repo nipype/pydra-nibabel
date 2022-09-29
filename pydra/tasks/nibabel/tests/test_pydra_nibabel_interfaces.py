@@ -39,6 +39,21 @@ def sorted_image(nifti_header, tmp_dir):
 
 
 @pytest.fixture
+def random_image(nifti_header, tmp_dir):
+    random_data = np.random.randint(0, 2, size=[10, 10, 10])
+    fpath = tmp_dir / "sorted.nii"
+    nb.save(
+        nb.Nifti1Image(
+            random_data,
+            nifti_header.get_best_affine(),
+            header=nifti_header,
+        ),
+        str(fpath),
+    )
+    return {"file": fpath, "array": random_data}
+
+
+@pytest.fixture
 def ones_mask(nifti_header, tmp_dir):
     ones_mask_array = np.ones((10, 10, 10))
     fpath = tmp_dir / "ones_mask.nii"
@@ -165,6 +180,40 @@ def test_apply_mask_raises_exception_with_wrong_affine(sorted_image, wrong_affin
 
 def test_regrid_to_zooms_1(sorted_image):
     zooms = (1, 1, 1)
+    pydra_task = regrid_to_zooms(in_file=sorted_image["file"], zooms=zooms)
+    pydra_result = pydra_task()
+
+    nipype_task = RegridToZooms()
+    nipype_task.inputs.in_file = sorted_image["file"]
+    nipype_task.inputs.zooms = zooms
+    nipype_result = nipype_task.run()
+
+    pydra_result_data = nb.load(pydra_result.output.out_file).get_data()
+    nipype_result_data = nb.load(nipype_result.outputs.out_file).get_data()
+    assert np.array_equal(nipype_result_data, pydra_result_data)
+
+    cleanup_files(nipype_result.outputs.out_file)
+
+
+def test_regrid_to_zooms_2(random_image):
+    zooms = (1, 1, 2)
+    pydra_task = regrid_to_zooms(in_file=random_image["file"], zooms=zooms)
+    pydra_result = pydra_task()
+
+    nipype_task = RegridToZooms()
+    nipype_task.inputs.in_file = random_image["file"]
+    nipype_task.inputs.zooms = zooms
+    nipype_result = nipype_task.run()
+
+    pydra_result_data = nb.load(pydra_result.output.out_file).get_data()
+    nipype_result_data = nb.load(nipype_result.outputs.out_file).get_data()
+    assert np.array_equal(nipype_result_data, pydra_result_data)
+
+    cleanup_files(nipype_result.outputs.out_file)
+
+
+def test_regrid_to_zooms_3(sorted_image):
+    zooms = (5, 4, 30)
     pydra_task = regrid_to_zooms(in_file=sorted_image["file"], zooms=zooms)
     pydra_result = pydra_task()
 
