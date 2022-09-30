@@ -69,7 +69,7 @@ jobs:
         python -c "import pydra as m; print(f'{m.__name__} {m.__version__} @ {m.__file__}')"
     - name: Check nibabel location
       run: |
-        ls $(python -c "import nibabel; from pathlib import Path; print(str(Path(nibabel.__file__).parent))")
+        ls $(python -c "import nibabel; print(nibabel.__file__)")
     - name: Test with pytest
       run: |
         pytest -sv --doctest-modules pydra/tasks/$SUBPACKAGE \
