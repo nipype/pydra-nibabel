@@ -67,6 +67,9 @@ jobs:
         pip install ".[test]"
         python -c "import pydra.tasks.$SUBPACKAGE as m; print(f'{m.__name__} {m.__version__} @ {m.__file__}')"
         python -c "import pydra as m; print(f'{m.__name__} {m.__version__} @ {m.__file__}')"
+    - name: Check nibabel location
+      run: |
+        python -c "import nibabel; print(f'location: {nibabel.__file__}')"
     - name: Test with pytest
       run: |
         pytest -sv --doctest-modules pydra/tasks/$SUBPACKAGE \
