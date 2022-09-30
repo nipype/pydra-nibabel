@@ -4,6 +4,8 @@ import tempfile
 from pathlib import Path
 import numpy as np
 import pytest
+
+raise Exception(f"Nibabel location: {nb.__file__}")
 from niworkflows.interfaces.nibabel import RegridToZooms
 from pydra.tasks.nibabel.utils import apply_mask, regrid_to_zooms
 
